@@ -1,0 +1,10 @@
+@Sheet.property
+def cursorRowIndex1(sheet):
+    return sheet.cursorRowIndex+1
+@Sheet.property
+def cursorVisibleColIndex1(sheet):
+    return sheet.cursorVisibleColIndex+1
+
+options.disp_rstatus_fmt = ' R:{sheet.cursorRowIndex1}/{sheet.nRows}[{sheet.nSelectedRows}] C:{sheet.cursorVisibleColIndex1}/{sheet.nVisibleCols}'
+
+options.disp_menu=False

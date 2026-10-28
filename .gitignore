@@ -1,0 +1,3 @@
+result
+# Per-machine identity (user, hostname, git email), written by bootstrap.sh
+host.nix

@@ -1,0 +1,11 @@
+# Global CLI tools from PyPI, installed into ~/.local/bin by `make switch`
+# (home-manager activation) and `make tools`. One `uv tool install` spec per line;
+# comments only on their own lines.
+visidata --with openpyxl
+# Doom's python module looks for these. pytest is only a fallback; projects should
+# still `uv add --dev pytest`, which direnv puts first on PATH.
+black
+pytest
+pipenv
+# Doom's rst module
+rstfmt
