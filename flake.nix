@@ -28,6 +28,7 @@
           ./modules/defaults.nix
           ./modules/packages.nix
           ./modules/fonts.nix
+          ./modules/tex.nix
           nix-homebrew.darwinModules.nix-homebrew
           ./modules/homebrew.nix
           home-manager.darwinModules.home-manager
