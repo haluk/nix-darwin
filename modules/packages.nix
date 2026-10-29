@@ -1,5 +1,9 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
+let
+  # Qt 6 for building Qt apps (e.g. vym) with CMake
+  qtPackages = with pkgs.qt6; [ qtbase qtsvg qtdeclarative qttools ];
+in
 {
   # Tools configured in home.nix (zsh, starship, zoxide, atuin, fzf, carapace,
   # bat, direnv, eza, git, difftastic, gnupg) are installed by home-manager.
@@ -89,5 +93,8 @@
     moreutils
     xh
     nmap
-  ];
+  ] ++ qtPackages;
+
+  # The system profile doesn't link lib/cmake, so point CMake's find_package at each Qt package
+  environment.variables.CMAKE_PREFIX_PATH = lib.concatMapStringsSep ":" toString qtPackages;
 }
