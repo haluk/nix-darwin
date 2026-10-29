@@ -4,11 +4,15 @@
 
 {
   environment.systemPackages = with pkgs; [
+    dbeaver-bin
+    jetbrains.idea
+    opencode
+    sioyek
   ];
 
   # Merged with the casks in homebrew.nix. Without this module, `cleanup = "zap"`
   # uninstalls them on the next switch.
   homebrew.casks = [
-    "claude-code" # cask, not nixpkgs: tracks Anthropic's releases closer than nixpkgs
+    # "claude-code" # cask, not nixpkgs: tracks Anthropic's releases closer than nixpkgs
   ];
 }
