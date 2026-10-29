@@ -17,6 +17,7 @@
         done
       '';
     }))
+    whatsapp-for-mac
   ];
 
   # Merged with the casks in homebrew.nix. Without this module, `cleanup = "zap"`
