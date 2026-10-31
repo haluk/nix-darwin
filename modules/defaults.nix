@@ -45,10 +45,7 @@
       expose-group-apps = true;
       # Minimal Dock: replaces every default icon on each rebuild.
       # Finder and Trash are pinned by macOS and always present.
-      persistent-apps = [
-        { app = "/System/Applications/Apps.app"; }
-        { app = "/System/Applications/System Settings.app"; }
-      ];
+      persistent-apps = [ ];
       persistent-others = [
         { folder = { path = "/Users/${user}/Downloads"; arrangement = "date-added"; }; }
       ];
