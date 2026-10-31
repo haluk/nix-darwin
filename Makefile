@@ -26,9 +26,10 @@ check: ## Evaluate the flake
 update: ## Bump flake inputs (nixpkgs, nix-darwin, home-manager); then `make switch`
 	nix flake update --flake $(FLAKE)
 
-upgrade: ## Upgrade Homebrew casks and uv tools (never automatic)
+upgrade: ## Upgrade Homebrew casks, uv tools and tmux plugins (never automatic)
 	brew update && brew upgrade
 	uv tool upgrade --all
+	~/.config/tmux/plugins/tpm/bin/update_plugins all
 
 tools: ## Install uv-tools.txt and `raco fmt` (`make switch` does this too)
 	grep -v -e '^#' -e '^$$' uv-tools.txt | while read -r spec; do uv tool install $$spec; done

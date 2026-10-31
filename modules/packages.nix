@@ -43,6 +43,7 @@ in
     js-beautify # Doom's web module: formats JS/CSS/HTML
     stylelint # Doom's web module: lints CSS (uses the project's .stylelintrc)
     uv
+    vlang # V; `v up` can't write to the Nix store, `make update` upgrades it
     just
     cmake
     gnumake # Apple's make is 3.81 (2006); GNU make 4.x is a compatible superset

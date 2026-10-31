@@ -15,8 +15,8 @@ on Determinate Nix.
 | `modules/fonts.nix` | Fonts |
 | `modules/homebrew.nix` | Homebrew itself (nix-homebrew) and GUI casks |
 | `modules/optional.nix` | Packages only some machines want (claude-code); on when `optional = true` |
-| `modules/home.nix` | Dotfiles: zsh, git, ssh, gpg, Docker/Colima, SDKMAN hook, LazyVim starter |
-| `dotfiles/` | Plain files linked into `~` or read into `~/.zshrc`: `zsh/` (shell functions, one `*.zsh` each, linked live so edits apply without a switch), `visidatarc`, `omniwm-settings.toml` (copied only if missing) |
+| `modules/home.nix` | Dotfiles: zsh, tmux, git, ssh, gpg, Docker/Colima, SDKMAN hook, LazyVim starter |
+| `dotfiles/` | Plain files linked into `~` or read into `~/.zshrc`: `zsh/` (shell functions, one `*.zsh` each, linked live so edits apply without a switch), `tmux.conf` (plugins via TPM), `visidatarc`, `omniwm-settings.toml` (copied only if missing) |
 | `Makefile` | Common actions; run `make` for the list |
 
 ## Fresh install

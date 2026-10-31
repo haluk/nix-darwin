@@ -148,6 +148,11 @@
             # Option is Alt (US layout; OmniWM grabs its own Option hotkeys first)
             macos-option-as-alt = true;
 
+            # Every window attaches to the "main" tmux session, creating it if needed.
+            # Via a login shell, so the tmux server (and the plugin scripts it runs)
+            # gets the Nix/Homebrew PATH, not just /usr/bin:/bin.
+            command = "/bin/zsh -lc 'exec tmux new-session -A -s main'";
+
             copy-on-select = "clipboard";
             clipboard-write = "allow";
             # Reading the clipboard via OSC 52 is opt-in per request (ssh, remote tools)
@@ -156,6 +161,24 @@
             # Nix owns the app bundle, so the built-in updater must stay off
             auto-update = "off";
           };
+        };
+
+        # The rest of the config, theme and plugin list are in dotfiles/tmux.conf;
+        # the plugins themselves come from TPM (home.activation.tmuxPlugins)
+        tmux = {
+          enable = true;
+          terminal = "tmux-256color";
+          mouse = true;
+          keyMode = "vi";
+          baseIndex = 1;
+          escapeTime = 10;
+          historyLimit = 100000;
+          focusEvents = true;
+          clock24 = true;
+          # prefix h/j/k/l moves between panes, H/J/K/L resizes them
+          customPaneNavigationAndResize = true;
+          resizeAmount = 5;
+          extraConfig = builtins.readFile ../dotfiles/tmux.conf;
         };
 
         # The `ls` alias is set in zsh initContent so coding agents keep the system ls
@@ -250,6 +273,24 @@
         '') (builtins.filter (l: l != "" && !lib.hasPrefix "#" l)
           (lib.splitString "\n" (builtins.readFile ../uv-tools.txt)))
       );
+
+      # TPM and the plugins listed in dotfiles/tmux.conf, cloned the way TPM names
+      # them ('user/repo#branch' -> plugins/repo). TPM's install_plugins can't do
+      # this: it needs a running tmux server that has loaded TPM. Installed ones are
+      # skipped; `make upgrade` updates them.
+      home.activation.tmuxPlugins = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+        export PATH="${lib.makeBinPath [ pkgs.git ]}:$PATH"
+        while read -r spec; do
+          repo=''${spec%%#*}
+          dir="$HOME/.config/tmux/plugins/''${repo##*/}"
+          [[ -d $dir ]] && continue
+          branch=()
+          [[ $spec == *#* ]] && branch=(--branch "''${spec#*#}")
+          run git clone --quiet --single-branch --recursive "''${branch[@]}" \
+              "https://github.com/$repo" "$dir" 2>/dev/null \
+            || warnEcho "Cloning tmux plugin $repo failed (offline?); re-run make switch"
+        done < <(sed -nE "s/^set -g @plugin '([^']+)'.*/\1/p" ${../dotfiles/tmux.conf})
+      '';
 
       # `raco fmt` (Doom's racket formatter) is a Racket package, not in nixpkgs.
       # User-scope, so a new Racket version reinstalls it; installed ones are skipped.
