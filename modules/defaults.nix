@@ -111,7 +111,8 @@
     };
   };
 
-  system.keyboard = { enableKeyMapping = true; remapCapsLockToEscape = true; };
+  # Mapping stays on with no remaps, so `make switch` clears the old Caps Lock -> Escape
+  system.keyboard.enableKeyMapping = true;
 
   system.startup.chime = false;
 
