@@ -52,7 +52,7 @@
     };
 
     finder = {
-      AppleShowAllFiles = true;
+      AppleShowAllFiles = false;
       FXEnableExtensionChangeWarning = false;
       FXPreferredViewStyle = "clmv"; # Column view (good for navigation)
       FXDefaultSearchScope = "SCcf"; # Search current folder
