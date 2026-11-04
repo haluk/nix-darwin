@@ -74,6 +74,7 @@ let
     todonotes # margin notes for drafts
     lipsum # filler text
     tcolorbox # boxed callouts; also styles minted listings
+    tikzfill # tcolorbox skins dependency (tikzfill.image.sty)
     beamer # slides
     beamertheme-metropolis
     fontawesome5 # icons
