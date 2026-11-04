@@ -106,5 +106,8 @@ let
   ]);
 in
 {
-  environment.systemPackages = [ tex ];
+  environment.systemPackages = [
+    tex
+    pkgs.pdfpc # presenter console for Beamer slides
+  ];
 }
