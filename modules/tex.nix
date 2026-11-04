@@ -48,6 +48,12 @@ let
     booktabs
     pgfplots # data plots in TikZ
     tikz-cd # commutative diagrams
+    aobs-tikz # overlay-beamer-styles TikZ library
+    tikzmark # mark positions in text for TikZ overlays
+    tikzpingus # penguins drawn in TikZ
+    fancyqr # styled QR codes
+    qrcode # fancyqr dependency
+    pict2e # fancyqr dependency
     multirow
     makecell
     threeparttable # table notes
@@ -77,16 +83,26 @@ let
     tikzfill # tcolorbox skins dependency (tikzfill.image.sty)
     beamer # slides
     beamertheme-metropolis
+    pdfpc # speaker notes and metadata for the pdfpc presenter
+    hyperxmp # pdfpc dependency
+    xstring # pdfpc dependency
+    atenddvi # hyperxmp dependency
+    ifmtarg # hyperxmp dependency
     fontawesome5 # icons
 
     # Code listings
     listings
+    listingsutf8 # UTF-8 input for listings; tcolorbox's listingsutf8 library
+    lstaddons # lstautogobble
+    accsupp # copy-paste text for listings (e.g. non-copyable line numbers)
+    lstfiracode # Fira Code ligatures in listings
     minted # needs -shell-escape
     fvextra
     upquote
 
     # Fonts
     collection-fontsrecommended
+    bera # berasans, beraserif, beramono
   ]);
 in
 {
