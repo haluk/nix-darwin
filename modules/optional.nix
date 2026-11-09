@@ -6,7 +6,6 @@
   environment.systemPackages = with pkgs; [
     dbeaver-bin
     jetbrains.idea
-    opencode
     # nixpkgs installs shaders/configs into Contents/MacOS, but sioyek looks in
     # Contents/Resources; without the shaders it renders blank pages.
     (sioyek.overrideAttrs (old: {

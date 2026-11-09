@@ -5,6 +5,9 @@ let
   qtPackages = with pkgs.qt6; [ qtbase qtsvg qtdeclarative qttools ];
 in
 {
+  # Per-machine packages; gitignored, so only imported where the file exists
+  imports = lib.optional (builtins.pathExists ./local.nix) ./local.nix;
+
   # Tools configured in home.nix (zsh, starship, zoxide, atuin, fzf, carapace,
   # bat, direnv, eza, git, difftastic, gnupg) are installed by home-manager.
   # Project-specific tools (compilers, SDKs, databases) belong in a per-project
@@ -65,6 +68,7 @@ in
     ripgrep
     fd
     jq
+    jnv # interactive JSON viewer with jq filters
     yq-go
     sd
     yazi
@@ -93,6 +97,7 @@ in
     sops
     moreutils
     xh
+    hoppscotch # GUI API client (REST, GraphQL, WebSocket)
     nmap
   ] ++ qtPackages;
 

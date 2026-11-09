@@ -72,10 +72,22 @@
           syntaxHighlighting.enable = true;
           # oh-my-zsh's extract plugin on its own (no framework): `extract`/`x` unpacks
           # any archive, with completion. Its .7z/.rar cases need unar (packages.nix).
-          plugins = [{
-            name = "extract";
-            src = "${pkgs.oh-my-zsh}/share/oh-my-zsh/plugins/extract";
-          }];
+          # jq: Alt-J on `cat x.json` opens an fzf jq REPL and puts the filter on the line
+          plugins = [
+            {
+              name = "extract";
+              src = "${pkgs.oh-my-zsh}/share/oh-my-zsh/plugins/extract";
+            }
+            {
+              name = "jq";
+              src = pkgs.fetchFromGitHub {
+                owner = "reegnz";
+                repo = "jq-zsh-plugin";
+                rev = "3aa96cc33a260ad4495d703da0fc6528110e6475";
+                hash = "sha256-NVUR+CgJ4fk1b+pAJjel/jDElsqAtBEJNWoatovRcG8=";
+              };
+            }
+          ];
           # SDKMAN itself is installed by bootstrap.sh (it is not managed by Nix)
           initContent = ''
             [[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"

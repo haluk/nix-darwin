@@ -1,3 +1,5 @@
 result
 # Per-machine identity (user, hostname, git email), written by bootstrap.sh
 host.nix
+# Per-machine packages, imported by packages.nix when present
+modules/local.nix
