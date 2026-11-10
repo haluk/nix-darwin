@@ -3,7 +3,7 @@ FLAKE := path:$(CURDIR)
 REBUILD := sudo -H darwin-rebuild # -H: root uses its own HOME, not yours
 
 .DEFAULT_GOAL := help
-.PHONY: help bootstrap switch build diff check update upgrade tools rollback generations omniwm omniwm-check clean gc uninstall
+.PHONY: help bootstrap switch build diff check update upgrade tools rollback generations omniwm omniwm-check omniwm-reset clean gc uninstall
 
 help: ## Show this help
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F ':.*## ' '{printf "  \033[1;34m%-12s\033[0m %s\n", $$1, $$2}'
@@ -15,20 +15,32 @@ switch: omniwm-check ## Apply the configuration
 	$(REBUILD) switch --flake $(FLAKE)
 
 # Stop a switch while OmniWM has settings changed in the app that aren't in dotfiles/
-# yet (a file no longer matches the hash the last switch installed).
+# yet (a file no longer matches the hash the last switch installed). A file without a
+# stamp was never installed by a switch (new machine): the switch backs it up and
+# replaces it.
 OMNIWM_FILES := settings.toml:omniwm-settings.toml shell/shell.toml:omniwm-shell.toml
 omniwm-check:
 	@for pair in $(OMNIWM_FILES); do \
 		cfg=~/.config/omniwm/$${pair%%:*}; src=dotfiles/$${pair##*:}; \
 		stamp=$$(dirname "$$cfg")/.installed-sha256; \
-		if [ -e "$$cfg" ] && ! cmp -s "$$cfg" "$$src" \
-		   && ! { [ -e "$$stamp" ] && [ "$$(shasum -a 256 < "$$cfg" | cut -d' ' -f1)" = "$$(cat "$$stamp")" ]; }; then \
+		if [ -e "$$cfg" ] && [ -e "$$stamp" ] && ! cmp -s "$$cfg" "$$src" \
+		   && [ "$$(shasum -a 256 < "$$cfg" | cut -d' ' -f1)" != "$$(cat "$$stamp")" ]; then \
 			echo "OmniWM's $$cfg was changed in the app since the last switch."; \
-			echo "  keep it:    make omniwm   (then review/commit $$src)"; \
-			echo "  discard it: rm $$cfg"; \
+			echo "  keep it:    make omniwm        (then review/commit $$src)"; \
+			echo "  discard it: make omniwm-reset  (backs it up, then switches)"; \
 			exit 1; \
 		fi; \
 	done
+
+# Back up OmniWM files changed in the app, then switch so dotfiles/ replaces them
+omniwm-reset: ## Drop OmniWM settings changed in the app (backed up) and switch
+	@for pair in $(OMNIWM_FILES); do \
+		cfg=~/.config/omniwm/$${pair%%:*}; \
+		if [ -e "$$cfg" ] && ! cmp -s "$$cfg" dotfiles/$${pair##*:}; then \
+			mv -v "$$cfg" "$$cfg.bak-$$(date +%Y%m%d)"; \
+		fi; \
+	done
+	$(MAKE) switch
 
 build: ## Build without activating (catches errors before a switch)
 	darwin-rebuild build --flake $(FLAKE)

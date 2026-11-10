@@ -1203,6 +1203,10 @@ id = "toggleShellWidget.hidden-bar"
 
 [[hotkeys]]
 binding = "Unassigned"
+id = "toggleShellWidget.system-stats"
+
+[[hotkeys]]
+binding = "Unassigned"
 id = "toggleShellWidget.volume"
 
 [[hotkeys]]

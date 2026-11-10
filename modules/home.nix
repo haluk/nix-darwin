@@ -248,19 +248,23 @@
       # read-only files. Each stamp holds the hash of what we last installed: if the
       # file still matches it, nobody changed it in the app and the repo version
       # replaces it; if not, it's left alone until `make omniwm` saves those changes
-      # into dotfiles/.
+      # into dotfiles/ (or `make omniwm-reset` drops them). A file no switch has
+      # installed yet (no stamp, e.g. a new machine) is backed up and replaced.
+      # OmniWM only reads them at launch, so it's restarted when one changes.
       home.activation.omniwmSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         hash() { ${pkgs.coreutils}/bin/sha256sum < "$1" | cut -d' ' -f1; }
+        omniwmChanged=
         omniwmInstall() {
           local src=$1 cfg=$2 stamp=$3
           if [[ -e $cfg ]] && cmp -s "$cfg" "$src"; then
             run sh -c "echo $(hash "$src") > '$stamp'"
-          elif [[ ! -e $cfg ]] || [[ -e $stamp && $(hash "$cfg") == $(< "$stamp") ]]; then
+          elif [[ ! -e $cfg ]] || [[ ! -e $stamp ]] || [[ $(hash "$cfg") == $(< "$stamp") ]]; then
+            if [[ -e $cfg && ! -e $stamp ]]; then
+              run cp "$cfg" "$cfg.bak-$(date +%Y%m%d)"
+            fi
             run install -D -m 644 "$src" "$cfg"
             run sh -c "echo $(hash "$src") > '$stamp'"
-            if /usr/bin/pgrep -qx OmniWM; then
-              warnEcho "$cfg updated from dotfiles/; restart OmniWM to load it"
-            fi
+            omniwmChanged=1
           else
             warnEcho "$cfg was changed in the app; left as is. Run make omniwm to keep it"
           fi
@@ -269,6 +273,12 @@
           "$HOME/.config/omniwm/settings.toml" "$HOME/.config/omniwm/.installed-sha256"
         omniwmInstall ${../dotfiles/omniwm-shell.toml} \
           "$HOME/.config/omniwm/shell/shell.toml" "$HOME/.config/omniwm/shell/.installed-sha256"
+        if [[ -n $omniwmChanged ]] && /usr/bin/pgrep -qx OmniWM; then
+          verboseEcho "Restarting OmniWM to load the new settings"
+          run /usr/bin/killall OmniWM
+          while /usr/bin/pgrep -qx OmniWM; do sleep 0.2; done
+          run /usr/bin/open -a OmniWM
+        fi
       '';
 
       # LazyVim starter, installed the way its docs say: back up any existing Neovim

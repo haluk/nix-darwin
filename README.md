@@ -46,8 +46,10 @@ Then:
 
 - OmniWM's settings come from `dotfiles/omniwm-settings.toml` and its menu bar layout from
   `dotfiles/omniwm-shell.toml`: every switch installs them unless you've changed them in the
-  app since the last switch. Then `make switch` stops
-  and asks you to run `make omniwm` first, which copies them back into the repo.
+  app since the last switch, and restarts OmniWM when they change. If you have, `make switch`
+  stops: `make omniwm` copies the app's version into the repo (review and commit it),
+  `make omniwm-reset` backs it up and switches to the repo's. On a new machine (or after
+  `git pull`) just run `make switch`: files no switch installed yet are backed up and replaced.
 - Neovim gets the [LazyVim starter](https://github.com/LazyVim/starter): if `~/.config/nvim`
   is not a LazyVim config yet, a switch moves it and `~/.local/{share,state}/nvim` and
   `~/.cache/nvim` to `*.bak`, clones the starter and removes its `.git`. Plugins install on
