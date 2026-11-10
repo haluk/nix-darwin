@@ -250,7 +250,8 @@
       # replaces it; if not, it's left alone until `make omniwm` saves those changes
       # into dotfiles/ (or `make omniwm-reset` drops them). A file no switch has
       # installed yet (no stamp, e.g. a new machine) is backed up and replaced.
-      # OmniWM only reads them at launch, so it's restarted when one changes.
+      # OmniWM only reads them at launch, so it's restarted when one (or a widget)
+      # changes.
       home.activation.omniwmSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         hash() { ${pkgs.coreutils}/bin/sha256sum < "$1" | cut -d' ' -f1; }
         omniwmChanged=
@@ -273,6 +274,17 @@
           "$HOME/.config/omniwm/settings.toml" "$HOME/.config/omniwm/.installed-sha256"
         omniwmInstall ${../dotfiles/omniwm-shell.toml} \
           "$HOME/.config/omniwm/shell/shell.toml" "$HOME/.config/omniwm/shell/.installed-sha256"
+        # Bar widgets that replace OmniWM's built-in ones (top-level shell/widgets/
+        # wins over default/). Copied rather than linked: they require ../lib, which
+        # OmniWM resolves within its shell folder, not inside the Nix store.
+        widgets="$HOME/.config/omniwm/shell/widgets"
+        for w in ${../dotfiles/omniwm-widgets}/*; do
+          if ! diff -rq "$w" "$widgets/''${w##*/}" >/dev/null 2>&1; then
+            run mkdir -p "$widgets"
+            run ${pkgs.coreutils}/bin/cp -R --no-preserve=mode "$w" "$widgets/"
+            omniwmChanged=1
+          fi
+        done
         if [[ -n $omniwmChanged ]] && /usr/bin/pgrep -qx OmniWM; then
           verboseEcho "Restarting OmniWM to load the new settings"
           run /usr/bin/killall OmniWM

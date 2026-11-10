@@ -17,7 +17,7 @@ on Determinate Nix.
 | `modules/optional.nix` | Packages only some machines want (claude-code); on when `optional = true` |
 | `modules/local.nix` | Packages for one machine only; gitignored, imported by `packages.nix` when present |
 | `modules/home.nix` | Dotfiles: zsh, tmux, git, ssh, gpg, Docker/Colima, SDKMAN hook, LazyVim starter |
-| `dotfiles/` | Plain files linked into `~` or read into `~/.zshrc`: `zsh/` (shell functions, one `*.zsh` each, linked live so edits apply without a switch), `tmux.conf` (plugins via TPM), `visidatarc`, `omniwm-settings.toml` and `omniwm-shell.toml` (menu bar layout; both installed on switch unless changed in the app; see below) |
+| `dotfiles/` | Plain files linked into `~` or read into `~/.zshrc`: `zsh/` (shell functions, one `*.zsh` each, linked live so edits apply without a switch), `tmux.conf` (plugins via TPM), `visidatarc`, `omniwm-settings.toml` and `omniwm-shell.toml` (menu bar layout; both installed on switch unless changed in the app; see below), `omniwm-widgets/` (menu bar widgets that replace OmniWM's own: a `yyyy-mm-dd (Tue) HH:MM` clock) |
 | `Makefile` | Common actions; run `make` for the list |
 
 ## Fresh install

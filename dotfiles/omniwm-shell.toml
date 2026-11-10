@@ -4,7 +4,10 @@
 [profiles.default]
 center = []
 leading = ["apple-menu", "app-menu", "omniwm", "workspaces", "scratchpads"]
-trailing = ["volume", "battery-details", "control-center", "clock"]
+trailing = ["volume", "battery-details", "clock", "control-center"]
 
 [profiles.default.hiddenBar]
 enabled = true
+
+[profiles.default.widgets.clock]
+icon = true
