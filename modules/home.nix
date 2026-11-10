@@ -243,13 +243,26 @@
         defaultCacheTtl = 3600;
       };
 
-      # OmniWM rewrites its settings when you change them in the app, so seed a
-      # writable copy once instead of linking a read-only file. To carry later
-      # changes to new machines, copy the file back into dotfiles/.
+      # OmniWM rewrites its settings when you change them in the app, so install a
+      # writable copy instead of linking a read-only file. The stamp holds the hash
+      # of what we last installed: if the file still matches it, nobody changed it
+      # in the app and the repo version replaces it; if not, it's left alone until
+      # `make omniwm` saves those changes into dotfiles/.
       home.activation.omniwmSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         cfg="$HOME/.config/omniwm/settings.toml"
-        if [[ ! -e $cfg ]]; then
-          run install -D -m 644 ${../dotfiles/omniwm-settings.toml} "$cfg"
+        stamp="$HOME/.config/omniwm/.installed-sha256"
+        src=${../dotfiles/omniwm-settings.toml}
+        hash() { ${pkgs.coreutils}/bin/sha256sum < "$1" | cut -d' ' -f1; }
+        if [[ -e $cfg ]] && cmp -s "$cfg" "$src"; then
+          run sh -c "echo $(hash "$src") > '$stamp'"
+        elif [[ ! -e $cfg ]] || [[ -e $stamp && $(hash "$cfg") == $(< "$stamp") ]]; then
+          run install -D -m 644 "$src" "$cfg"
+          run sh -c "echo $(hash "$src") > '$stamp'"
+          if pgrep -qx OmniWM; then
+            warnEcho "OmniWM settings updated from dotfiles/; restart OmniWM to load them"
+          fi
+        else
+          warnEcho "OmniWM settings were changed in the app; left as is. Run make omniwm to keep them"
         fi
       '';
 

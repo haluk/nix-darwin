@@ -17,7 +17,7 @@ on Determinate Nix.
 | `modules/optional.nix` | Packages only some machines want (claude-code); on when `optional = true` |
 | `modules/local.nix` | Packages for one machine only; gitignored, imported by `packages.nix` when present |
 | `modules/home.nix` | Dotfiles: zsh, tmux, git, ssh, gpg, Docker/Colima, SDKMAN hook, LazyVim starter |
-| `dotfiles/` | Plain files linked into `~` or read into `~/.zshrc`: `zsh/` (shell functions, one `*.zsh` each, linked live so edits apply without a switch), `tmux.conf` (plugins via TPM), `visidatarc`, `omniwm-settings.toml` (copied only if missing) |
+| `dotfiles/` | Plain files linked into `~` or read into `~/.zshrc`: `zsh/` (shell functions, one `*.zsh` each, linked live so edits apply without a switch), `tmux.conf` (plugins via TPM), `visidatarc`, `omniwm-settings.toml` (installed on switch unless changed in the app; see below) |
 | `Makefile` | Common actions; run `make` for the list |
 
 ## Fresh install
@@ -44,8 +44,9 @@ make bootstrap                         # or ./bootstrap.sh
 
 Then:
 
-- OmniWM's settings are seeded from `dotfiles/omniwm-settings.toml` on first install; after
-  changing them in the app, `make omniwm` copies them back into the repo.
+- OmniWM's settings come from `dotfiles/omniwm-settings.toml`: every switch installs it
+  unless you've changed settings in the app since the last switch. Then `make switch` stops
+  and asks you to run `make omniwm` first, which copies them back into the repo.
 - Neovim gets the [LazyVim starter](https://github.com/LazyVim/starter): if `~/.config/nvim`
   is not a LazyVim config yet, a switch moves it and `~/.local/{share,state}/nvim` and
   `~/.cache/nvim` to `*.bak`, clones the starter and removes its `.git`. Plugins install on

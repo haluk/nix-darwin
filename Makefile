@@ -3,7 +3,7 @@ FLAKE := path:$(CURDIR)
 REBUILD := sudo -H darwin-rebuild # -H: root uses its own HOME, not yours
 
 .DEFAULT_GOAL := help
-.PHONY: help bootstrap switch build diff check update upgrade tools rollback generations omniwm clean gc uninstall
+.PHONY: help bootstrap switch build diff check update upgrade tools rollback generations omniwm omniwm-check clean gc uninstall
 
 help: ## Show this help
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F ':.*## ' '{printf "  \033[1;34m%-12s\033[0m %s\n", $$1, $$2}'
@@ -11,8 +11,20 @@ help: ## Show this help
 bootstrap: ## Set up a fresh Mac (asks for user, hostname, optional packages)
 	./bootstrap.sh
 
-switch: ## Apply the configuration
+switch: omniwm-check ## Apply the configuration
 	$(REBUILD) switch --flake $(FLAKE)
+
+# Stop a switch while OmniWM has settings changed in the app that aren't in dotfiles/
+# yet (the file no longer matches the hash the last switch installed).
+omniwm-check:
+	@cfg=~/.config/omniwm/settings.toml; stamp=~/.config/omniwm/.installed-sha256; \
+	if [ -e "$$cfg" ] && ! cmp -s "$$cfg" dotfiles/omniwm-settings.toml \
+	   && ! { [ -e "$$stamp" ] && [ "$$(shasum -a 256 < "$$cfg" | cut -d' ' -f1)" = "$$(cat "$$stamp")" ]; }; then \
+		echo "OmniWM settings were changed in the app since the last switch."; \
+		echo "  keep them:    make omniwm   (then review/commit dotfiles/omniwm-settings.toml)"; \
+		echo "  discard them: rm $$cfg"; \
+		exit 1; \
+	fi
 
 build: ## Build without activating (catches errors before a switch)
 	darwin-rebuild build --flake $(FLAKE)
