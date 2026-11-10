@@ -258,7 +258,7 @@
         elif [[ ! -e $cfg ]] || [[ -e $stamp && $(hash "$cfg") == $(< "$stamp") ]]; then
           run install -D -m 644 "$src" "$cfg"
           run sh -c "echo $(hash "$src") > '$stamp'"
-          if pgrep -qx OmniWM; then
+          if /usr/bin/pgrep -qx OmniWM; then
             warnEcho "OmniWM settings updated from dotfiles/; restart OmniWM to load them"
           fi
         else
