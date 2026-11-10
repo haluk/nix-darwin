@@ -1,0 +1,10 @@
+
+[profiles]
+
+[profiles.default]
+center = []
+leading = ["apple-menu", "app-menu", "omniwm", "workspaces", "scratchpads"]
+trailing = ["volume", "battery-details", "control-center", "clock"]
+
+[profiles.default.hiddenBar]
+enabled = true

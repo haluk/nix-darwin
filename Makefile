@@ -15,16 +15,20 @@ switch: omniwm-check ## Apply the configuration
 	$(REBUILD) switch --flake $(FLAKE)
 
 # Stop a switch while OmniWM has settings changed in the app that aren't in dotfiles/
-# yet (the file no longer matches the hash the last switch installed).
+# yet (a file no longer matches the hash the last switch installed).
+OMNIWM_FILES := settings.toml:omniwm-settings.toml shell/shell.toml:omniwm-shell.toml
 omniwm-check:
-	@cfg=~/.config/omniwm/settings.toml; stamp=~/.config/omniwm/.installed-sha256; \
-	if [ -e "$$cfg" ] && ! cmp -s "$$cfg" dotfiles/omniwm-settings.toml \
-	   && ! { [ -e "$$stamp" ] && [ "$$(shasum -a 256 < "$$cfg" | cut -d' ' -f1)" = "$$(cat "$$stamp")" ]; }; then \
-		echo "OmniWM settings were changed in the app since the last switch."; \
-		echo "  keep them:    make omniwm   (then review/commit dotfiles/omniwm-settings.toml)"; \
-		echo "  discard them: rm $$cfg"; \
-		exit 1; \
-	fi
+	@for pair in $(OMNIWM_FILES); do \
+		cfg=~/.config/omniwm/$${pair%%:*}; src=dotfiles/$${pair##*:}; \
+		stamp=$$(dirname "$$cfg")/.installed-sha256; \
+		if [ -e "$$cfg" ] && ! cmp -s "$$cfg" "$$src" \
+		   && ! { [ -e "$$stamp" ] && [ "$$(shasum -a 256 < "$$cfg" | cut -d' ' -f1)" = "$$(cat "$$stamp")" ]; }; then \
+			echo "OmniWM's $$cfg was changed in the app since the last switch."; \
+			echo "  keep it:    make omniwm   (then review/commit $$src)"; \
+			echo "  discard it: rm $$cfg"; \
+			exit 1; \
+		fi; \
+	done
 
 build: ## Build without activating (catches errors before a switch)
 	darwin-rebuild build --flake $(FLAKE)
@@ -47,8 +51,10 @@ tools: ## Install uv-tools.txt and `raco fmt` (`make switch` does this too)
 	grep -v -e '^#' -e '^$$' uv-tools.txt | while read -r spec; do uv tool install $$spec; done
 	raco pkg install --auto --batch --user --skip-installed fmt
 
-omniwm: ## Copy OmniWM's current settings into dotfiles/ (to commit)
-	cp ~/.config/omniwm/settings.toml dotfiles/omniwm-settings.toml
+omniwm: ## Copy OmniWM's current settings and menu bar into dotfiles/ (to commit)
+	@for pair in $(OMNIWM_FILES); do \
+		cp -v ~/.config/omniwm/$${pair%%:*} dotfiles/$${pair##*:}; \
+	done
 
 rollback: ## Switch back to the previous generation
 	$(REBUILD) --rollback

@@ -243,27 +243,32 @@
         defaultCacheTtl = 3600;
       };
 
-      # OmniWM rewrites its settings when you change them in the app, so install a
-      # writable copy instead of linking a read-only file. The stamp holds the hash
-      # of what we last installed: if the file still matches it, nobody changed it
-      # in the app and the repo version replaces it; if not, it's left alone until
-      # `make omniwm` saves those changes into dotfiles/.
+      # OmniWM rewrites its settings (and the menu bar layout in shell/shell.toml) when
+      # you change them in the app, so install writable copies instead of linking
+      # read-only files. Each stamp holds the hash of what we last installed: if the
+      # file still matches it, nobody changed it in the app and the repo version
+      # replaces it; if not, it's left alone until `make omniwm` saves those changes
+      # into dotfiles/.
       home.activation.omniwmSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        cfg="$HOME/.config/omniwm/settings.toml"
-        stamp="$HOME/.config/omniwm/.installed-sha256"
-        src=${../dotfiles/omniwm-settings.toml}
         hash() { ${pkgs.coreutils}/bin/sha256sum < "$1" | cut -d' ' -f1; }
-        if [[ -e $cfg ]] && cmp -s "$cfg" "$src"; then
-          run sh -c "echo $(hash "$src") > '$stamp'"
-        elif [[ ! -e $cfg ]] || [[ -e $stamp && $(hash "$cfg") == $(< "$stamp") ]]; then
-          run install -D -m 644 "$src" "$cfg"
-          run sh -c "echo $(hash "$src") > '$stamp'"
-          if /usr/bin/pgrep -qx OmniWM; then
-            warnEcho "OmniWM settings updated from dotfiles/; restart OmniWM to load them"
+        omniwmInstall() {
+          local src=$1 cfg=$2 stamp=$3
+          if [[ -e $cfg ]] && cmp -s "$cfg" "$src"; then
+            run sh -c "echo $(hash "$src") > '$stamp'"
+          elif [[ ! -e $cfg ]] || [[ -e $stamp && $(hash "$cfg") == $(< "$stamp") ]]; then
+            run install -D -m 644 "$src" "$cfg"
+            run sh -c "echo $(hash "$src") > '$stamp'"
+            if /usr/bin/pgrep -qx OmniWM; then
+              warnEcho "$cfg updated from dotfiles/; restart OmniWM to load it"
+            fi
+          else
+            warnEcho "$cfg was changed in the app; left as is. Run make omniwm to keep it"
           fi
-        else
-          warnEcho "OmniWM settings were changed in the app; left as is. Run make omniwm to keep them"
-        fi
+        }
+        omniwmInstall ${../dotfiles/omniwm-settings.toml} \
+          "$HOME/.config/omniwm/settings.toml" "$HOME/.config/omniwm/.installed-sha256"
+        omniwmInstall ${../dotfiles/omniwm-shell.toml} \
+          "$HOME/.config/omniwm/shell/shell.toml" "$HOME/.config/omniwm/shell/.installed-sha256"
       '';
 
       # LazyVim starter, installed the way its docs say: back up any existing Neovim
