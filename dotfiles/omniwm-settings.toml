@@ -1002,7 +1002,7 @@ binding = "Unassigned"
 id = "moveToRoot"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Control+Option+S"
 id = "toggleSplit"
 
 [[hotkeys]]
@@ -1038,7 +1038,7 @@ binding = "Unassigned"
 id = "preselect.left"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Control+Option+V"
 id = "preselect.right"
 
 [[hotkeys]]
@@ -1046,7 +1046,7 @@ binding = "Unassigned"
 id = "preselect.up"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Control+Option+H"
 id = "preselect.down"
 
 [[hotkeys]]
