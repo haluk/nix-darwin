@@ -93,6 +93,8 @@
             [[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
             for f in ~/.config/zsh/functions/*.zsh(N); do source "$f"; done
             unset f
+            # Tab-cycling through matches highlights the selected one (menu select)
+            zstyle ':completion:*' menu select
             # Fancy `ls` for humans only: coding agents (Claude Code sets CLAUDECODE) keep
             # the system ls, whose flags (-t, -S, ...) eza does not accept
             [[ -z "$CLAUDECODE" ]] && alias ls='eza --group-directories-first'
