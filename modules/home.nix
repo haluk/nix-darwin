@@ -68,6 +68,8 @@
             lg = "lazygit";
             vim = "nvim";
           };
+          # zsh would pick vi mode because EDITOR is nvim; keep emacs bindings (ESC-. etc.)
+          defaultKeymap = "emacs";
           autosuggestion.enable = true;
           syntaxHighlighting.enable = true;
           # oh-my-zsh's extract plugin on its own (no framework): `extract`/`x` unpacks
