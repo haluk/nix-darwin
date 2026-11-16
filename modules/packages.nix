@@ -92,6 +92,9 @@ in
     hyperfine
     tokei
 
+    # Media
+    mpv
+
     # Security & Networking
     age
     sops
