@@ -3,7 +3,7 @@ FLAKE := path:$(CURDIR)
 REBUILD := sudo -H darwin-rebuild # -H: root uses its own HOME, not yours
 
 .DEFAULT_GOAL := help
-.PHONY: help bootstrap switch build diff check update upgrade tools rollback generations omniwm omniwm-check omniwm-reset clean gc uninstall
+.PHONY: help bootstrap switch build diff check update upgrade tools rollback generations omniwm omniwm-check omniwm-reset pdf-tools clean gc uninstall
 
 help: ## Show this help
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F ':.*## ' '{printf "  \033[1;34m%-12s\033[0m %s\n", $$1, $$2}'
@@ -67,6 +67,16 @@ omniwm: ## Copy OmniWM's current settings and menu bar into dotfiles/ (to commit
 	@for pair in $(OMNIWM_FILES); do \
 		cp -v ~/.config/omniwm/$${pair%%:*} dotfiles/$${pair##*:}; \
 	done
+
+# autobuild's brew step is skipped (-D): Homebrew is Nix-managed here and would pull
+# in ~50 formulae. A throwaway nix dev shell supplies the tools instead; unlike
+# `nix shell` it sets ACLOCAL_PATH (pkg.m4 for autoreconf) and PKG_CONFIG_PATH.
+PDF_TOOLS := ~/.config/emacs/.local/straight/build-*/pdf-tools
+PDF_TOOLS_SHELL := let p = import (builtins.getFlake "nixpkgs") { system = builtins.currentSystem; }; \
+	in p.mkShell { packages = with p; [ poppler pkg-config autoconf automake gnumake libpng ]; }
+pdf-tools: ## Build pdf-tools' epdfinfo in a nix dev shell (Doom: after `doom sync`/Emacs upgrade)
+	nix develop --impure --expr '$(PDF_TOOLS_SHELL)' -c \
+		sh -c 'cd $(PDF_TOOLS)/build/server && ./autobuild -D -i $(PDF_TOOLS)'
 
 rollback: ## Switch back to the previous generation
 	$(REBUILD) --rollback
