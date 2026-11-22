@@ -100,7 +100,6 @@ in
     sops
     moreutils
     xh
-    hoppscotch # GUI API client (REST, GraphQL, WebSocket)
     nmap
   ] ++ qtPackages;
 
