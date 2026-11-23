@@ -17,6 +17,10 @@
       home.stateVersion = "26.11";
 
       home.sessionVariables = {
+        # launchd (which starts the tmux server) sets no locale, so shells in tmux ran
+        # in "C": zsh then counts the multibyte λ prompt char as 2 columns and redraws
+        # one column off after completion (`ca<Tab>` showed `ccat`).
+        LANG = "en_US.UTF-8";
         SDKMAN_DIR = "${config.home.homeDirectory}/.sdkman";
         # Docker CLI and Testcontainers talk to Colima's socket
         DOCKER_HOST = "unix://${colimaSock}";
@@ -41,6 +45,22 @@
         enable = true;
         config = {
           ProgramArguments = [ "/usr/bin/open" "-a" "OmniWM" ];
+          RunAtLoad = true;
+        };
+      };
+
+      # Start the tmux server at login, so TPM's ~5s of plugin loading (slow on
+      # macOS: hundreds of short-lived processes) is done before the first Ghostty
+      # window attaches; exit-empty off in tmux.conf keeps it running. A login zsh,
+      # so the server and the plugin scripts it runs get the full PATH.
+      launchd.agents.tmux-server = {
+        enable = true;
+        config = {
+          ProgramArguments = [
+            "/bin/zsh"
+            "-lc"
+            "exec ${config.programs.tmux.package}/bin/tmux start-server"
+          ];
           RunAtLoad = true;
         };
       };
@@ -164,10 +184,16 @@
             # Option is Alt (US layout; OmniWM grabs its own Option hotkeys first)
             macos-option-as-alt = true;
 
-            # Every window attaches to the "main" tmux session, creating it if needed.
-            # Via a login shell, so the tmux server (and the plugin scripts it runs)
-            # gets the Nix/Homebrew PATH, not just /usr/bin:/bin.
-            command = "/bin/zsh -lc 'exec tmux new-session -A -s main'";
+            # The first window attaches to the "main" tmux session, creating it if
+            # needed; while main is shown in a window, further windows get a fresh
+            # session of their own, killed when its window closes or its shell exits
+            # (detach-on-destroy on overrides the global off, which would switch the
+            # window to main). Via a login shell, so the tmux server (and the plugin
+            # scripts it runs) gets the Nix/Homebrew PATH, not just /usr/bin:/bin.
+            # -c ~ starts sessions in $HOME: a Ghostty launched at login by launchd
+            # inherits "/", and tmux would use that cwd (it is ignored on attach).
+            command = "/bin/zsh -lc 'if [[ $(tmux display -p -t \"=main:\" \"#{session_attached}\" 2>/dev/null) == [1-9]* ]]; then exec tmux new-session -c ~ \\; set destroy-unattached on \\; set detach-on-destroy on; else exec tmux new-session -A -s main -c ~; fi'";
+            working-directory = "home";
 
             copy-on-select = "clipboard";
             clipboard-write = "allow";
