@@ -21,7 +21,7 @@ in
     emacs
     (hunspell.withDicts (d: [ d.en_US ])) # Doom's spell module; the wrapper sets DICPATH
     pngpaste # Doom's org +dragndrop: paste clipboard images into org files
-    plantuml # Doom's plantuml module; bundles its own JRE, separate from SDKMAN
+    (plantuml.overrideAttrs { doCheck = false; }) # Doom's plantuml module; bundles its own JRE. shortcut: tests skipped, 1.2026.10 fails 6 upstream; drop once nixpkgs fixes it
     graphviz # dot: PlantUML renders most diagram types with it
     neovim
     lazygit
