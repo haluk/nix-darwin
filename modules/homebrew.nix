@@ -25,6 +25,7 @@
     casks = [
       "omniwm" # cask, not nixpkgs: fixed /Applications path keeps the Accessibility permission across updates
       "google-chrome"
+      "firefox"
       "hoppscotch" # cask, not nixpkgs: the Nix build is read-only, so its in-app update prompt can't be satisfied
       "logseq" # cask, not nixpkgs: nixpkgs is a major version behind (0.10 vs 2.x)
     ];
