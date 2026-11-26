@@ -308,6 +308,9 @@ minHeight = 495.0
 minWidth = 500.0
 
 [[appRules]]
+assignToWorkspace = "1"
+axRole = "AXWindow"
+axSubrole = "AXStandardWindow"
 bundleId = "org.mozilla.firefox"
 id = "005C00D3-F665-47F8-BDAE-D80790E9E46B"
 minHeight = 120.0
